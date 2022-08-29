@@ -3,7 +3,9 @@ import { useRef, useState } from 'react'
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState('')
   // 1st method using state
-  const [enteredNameIsValid, setEnteredNameIsValid] = useState(true)
+  const [enteredNameIsValid, setEnteredNameIsValid] = useState(false)
+  // while you could set to true initially .. false is the better way to initialize it
+  const [enteredNameTouched, setEnteredNameTouched] = useState(false) //whether user already did attempt to enter a name
   const nameInputRef = useRef()
   // 2nd method is using ref and reading from input when we need it
 
@@ -15,6 +17,8 @@ const SimpleInput = (props) => {
     // default JS behavior if form is submitted with a button inside of a form an htpp req is sent to the server serving this website
     // if the req was sent it would cause the page to be reloaded which we don't want...would restart entire app .. lose state
     event.preventDefault()
+
+    setEnteredNameTouched(true) //if user submitted form they have confirmed their inputs
 
     if (enteredName.trim() === '') {
       setEnteredNameIsValid(false)
@@ -34,9 +38,11 @@ const SimpleInput = (props) => {
     // React should be the only thing manipulating the DOM
   }
 
-  const nameInputClasses = enteredNameIsValid
-    ? 'form-control'
-    : 'form-control invalid'
+  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched
+
+  const nameInputClasses = nameInputIsInvalid
+    ? 'form-control invalid'
+    : 'form-control'
   return (
     <form onSubmit={formSubmissionHandler}>
       <div className={nameInputClasses}>
@@ -48,7 +54,7 @@ const SimpleInput = (props) => {
           onChange={nameInputChangeHandler}
           value={enteredName}
         />
-        {!enteredNameIsValid && (
+        {nameInputIsInvalid && (
           <p className="error-text">Name must not be empty.</p>
         )}
       </div>
