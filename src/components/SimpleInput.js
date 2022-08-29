@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState('')
@@ -6,10 +6,20 @@ const SimpleInput = (props) => {
   const [enteredNameTouched, setEnteredNameTouched] = useState(false) //whether user already did attempt to enter a name
   // const nameInputRef = useRef()
   // 2nd method is using ref and reading from input when we need it
+  // const [formIsValid, setFormIsValid] = useState(false) // update this when a form input changes
+  // don't need to use state for this or useEffect (overall form validitity)
 
   // we can derive this from enteredName state
   const enteredNameIsValid = enteredName.trim() !== ''
   const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched
+
+  let formIsValid = false
+
+  // combine all dependencies and check if they are all valid, if they are set overall form to VALID
+  if (enteredNameIsValid) {
+    formIsValid = true
+  }
+  // want to set overall form validity so we add validities as dependencies
 
   const nameInputChangeHandler = (e) => {
     setEnteredName(e.target.value)
@@ -62,7 +72,7 @@ const SimpleInput = (props) => {
         )}
       </div>
       <div className="form-actions">
-        <button>Submit</button>
+        <button disabled={!formIsValid}>Submit</button>
       </div>
     </form>
   )
