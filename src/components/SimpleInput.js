@@ -13,6 +13,15 @@ const SimpleInput = (props) => {
     setEnteredName(e.target.value)
   }
 
+  const nameInputBlurHandler = (e) => {
+    setEnteredNameTouched(true) // if input was focused then it was touched
+
+    if (enteredName.trim() === '') {
+      setEnteredNameIsValid(false)
+      return
+    }
+  }
+
   const formSubmissionHandler = (event) => {
     // default JS behavior if form is submitted with a button inside of a form an htpp req is sent to the server serving this website
     // if the req was sent it would cause the page to be reloaded which we don't want...would restart entire app .. lose state
@@ -52,6 +61,7 @@ const SimpleInput = (props) => {
           type="text"
           id="name"
           onChange={nameInputChangeHandler}
+          onBlur={nameInputBlurHandler}
           value={enteredName}
         />
         {nameInputIsInvalid && (
