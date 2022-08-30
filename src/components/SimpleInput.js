@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+// import { useState, useEffect } from 'react'
 import useInput from '../hooks/use-input'
 
 const SimpleInput = (props) => {
+  // using custom hook for managing name input, touch state, validity
   const {
     value: enteredName,
     isValid: enteredNameIsValid,
@@ -10,32 +11,19 @@ const SimpleInput = (props) => {
     inputBlurHandler: nameBlurHandler,
     reset: resetNameInput,
   } = useInput((value) => value.trim() !== '')
-  // const [enteredName, setEnteredName] = useState('')
-  // // 1st method using state
-  // const [enteredNameTouched, setEnteredNameTouched] = useState(false) //whether user already did attempt to enter a name
-  // const nameInputRef = useRef()
-  // 2nd method is using ref and reading from input when we need it
-  // const [formIsValid, setFormIsValid] = useState(false) // update this when a form input changes
-  // don't need to use state for this or useEffect (overall form validitity)
-  const [enteredEmail, setEnteredEmail] = useState('')
-  const [enteredEmailTouched, setEnteredEmailTouched] = useState(false)
+
+  const {
+    value: enteredEmail,
+    isValid: enteredEmailIsValid,
+    hasError: emailInputHasError,
+    valueChangeHandler: emailChangeHandler,
+    inputBlurHandler: emailBlurHandler,
+    reset: resetEmailInput,
+  } = useInput((value) => value.includes('@'))
 
   // we can derive this from enteredName state
   // const enteredNameIsValid = enteredName.trim() !== ''
   // const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched
-
-  // Email validations - derive from enteredEmail state
-  const enteredEmailIsValid = enteredEmail
-    .trim()
-    .split('')
-    .some((char) => {
-      if (char === '@') {
-        return true
-      }
-      return false
-    })
-
-  const emailInputIsInvalid = !enteredEmailIsValid && enteredEmailTouched
 
   let formIsValid = false
 
@@ -48,18 +36,6 @@ const SimpleInput = (props) => {
   // const nameInputChangeHandler = (e) => {
   //   setEnteredName(e.target.value)
   // }
-
-  const emailInputChangeHandler = (e) => {
-    setEnteredEmail(e.target.value)
-  }
-
-  // const nameInputBlurHandler = (e) => {
-  //   setEnteredNameTouched(true) // if input was focused then it was touched
-  // }
-
-  const emailInputBlurHandler = (e) => {
-    setEnteredEmailTouched(true)
-  }
 
   const formSubmissionHandler = (event) => {
     // default JS behavior if form is submitted with a button inside of a form an htpp req is sent to the server serving this website
@@ -83,18 +59,14 @@ const SimpleInput = (props) => {
     // setEnteredName('') //reset the input field using state
     // setEnteredNameTouched(false)
     resetNameInput()
-    setEnteredEmail('')
-    setEnteredEmailTouched(false)
-    // nameInputRef.current.value=''
-    // technically can do same using ref but not good practice b/c you are modifying the DOM directly
-    // React should be the only thing manipulating the DOM
+    resetEmailInput()
   }
 
   const nameInputClasses = nameInputHasError
     ? 'form-control invalid'
     : 'form-control'
 
-  const emailInputClasses = emailInputIsInvalid
+  const emailInputClasses = emailInputHasError
     ? 'form-control invalid'
     : 'form-control'
 
@@ -118,11 +90,11 @@ const SimpleInput = (props) => {
         <input
           type="email"
           id="email"
-          onChange={emailInputChangeHandler}
-          onBlur={emailInputBlurHandler}
+          onChange={emailChangeHandler}
+          onBlur={emailBlurHandler}
           value={enteredEmail}
         />
-        {emailInputIsInvalid && (
+        {emailInputHasError && (
           <p className="error-text">Email must not be empty and have @.</p>
         )}
       </div>
