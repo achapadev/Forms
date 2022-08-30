@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react'
+import useInput from '../hooks/use-input'
 
 const SimpleInput = (props) => {
-  const [enteredName, setEnteredName] = useState('')
-  // 1st method using state
-  const [enteredNameTouched, setEnteredNameTouched] = useState(false) //whether user already did attempt to enter a name
+  const {
+    value: enteredName,
+    isValid: enteredNameIsValid,
+    hasError: nameInputHasError,
+    valueChangeHandler: nameChangedHandler,
+    inputBlurHandler: nameBlurHandler,
+    reset: resetNameInput,
+  } = useInput((value) => value.trim() !== '')
+  // const [enteredName, setEnteredName] = useState('')
+  // // 1st method using state
+  // const [enteredNameTouched, setEnteredNameTouched] = useState(false) //whether user already did attempt to enter a name
   // const nameInputRef = useRef()
   // 2nd method is using ref and reading from input when we need it
   // const [formIsValid, setFormIsValid] = useState(false) // update this when a form input changes
@@ -12,8 +21,8 @@ const SimpleInput = (props) => {
   const [enteredEmailTouched, setEnteredEmailTouched] = useState(false)
 
   // we can derive this from enteredName state
-  const enteredNameIsValid = enteredName.trim() !== ''
-  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched
+  // const enteredNameIsValid = enteredName.trim() !== ''
+  // const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched
 
   // Email validations - derive from enteredEmail state
   const enteredEmailIsValid = enteredEmail
@@ -36,17 +45,17 @@ const SimpleInput = (props) => {
   }
   // want to set overall form validity so we add validities as dependencies
 
-  const nameInputChangeHandler = (e) => {
-    setEnteredName(e.target.value)
-  }
+  // const nameInputChangeHandler = (e) => {
+  //   setEnteredName(e.target.value)
+  // }
 
   const emailInputChangeHandler = (e) => {
     setEnteredEmail(e.target.value)
   }
 
-  const nameInputBlurHandler = (e) => {
-    setEnteredNameTouched(true) // if input was focused then it was touched
-  }
+  // const nameInputBlurHandler = (e) => {
+  //   setEnteredNameTouched(true) // if input was focused then it was touched
+  // }
 
   const emailInputBlurHandler = (e) => {
     setEnteredEmailTouched(true)
@@ -57,8 +66,8 @@ const SimpleInput = (props) => {
     // if the req was sent it would cause the page to be reloaded which we don't want...would restart entire app .. lose state
     event.preventDefault()
 
-    setEnteredNameTouched(true) //if user submitted form they have confirmed their inputs
-    setEnteredEmailTouched(true)
+    // setEnteredNameTouched(true) //if user submitted form they have confirmed their inputs
+    // setEnteredEmailTouched(true)
 
     // if name or email input is invalid stop
     if (!enteredNameIsValid || !enteredEmailIsValid) {
@@ -71,8 +80,9 @@ const SimpleInput = (props) => {
     // const enteredValue = nameInputRef.current.value
     // console.log(enteredValue)
 
-    setEnteredName('') //reset the input field using state
-    setEnteredNameTouched(false)
+    // setEnteredName('') //reset the input field using state
+    // setEnteredNameTouched(false)
+    resetNameInput()
     setEnteredEmail('')
     setEnteredEmailTouched(false)
     // nameInputRef.current.value=''
@@ -80,7 +90,7 @@ const SimpleInput = (props) => {
     // React should be the only thing manipulating the DOM
   }
 
-  const nameInputClasses = nameInputIsInvalid
+  const nameInputClasses = nameInputHasError
     ? 'form-control invalid'
     : 'form-control'
 
@@ -95,11 +105,11 @@ const SimpleInput = (props) => {
         <input
           type="text"
           id="name"
-          onChange={nameInputChangeHandler}
-          onBlur={nameInputBlurHandler}
+          onChange={nameChangedHandler}
+          onBlur={nameBlurHandler}
           value={enteredName}
         />
-        {nameInputIsInvalid && (
+        {nameInputHasError && (
           <p className="error-text">Name must not be empty.</p>
         )}
       </div>
