@@ -1,32 +1,53 @@
-import { useState } from 'react'
+import { useReducer } from 'react'
+
+const initialInputState = {
+  value: '',
+  isTouched: false,
+}
+
+const inputStateReducer = (state, action) => {
+  if (action.type === 'INPUT') {
+    return { value: action.value, isTouched: state.isTouched }
+  }
+  if (action.type === 'BLUR') {
+    return { isTouched: true, value: state.value }
+  }
+  if (action.type === 'RESET') {
+    return { isTouched: false, value: '' }
+  }
+  return inputStateReducer
+}
 
 const useInput = (validateValue) => {
-  // we want to manage value of a given input, touched state, infer its validity
-  // flexible - concrete validation logic should be passed in from the outside
-  const [enteredValue, setEnteredValue] = useState('')
-  const [isTouched, setIsTouched] = useState(false) //whether user already did attempt to enter a name
+  const [inputState, dispatch] = useReducer(
+    inputStateReducer,
+    initialInputState
+  )
 
   // we can derive this from enteredName state
-  const valueIsValid = validateValue(enteredValue)
-  const hasError = !valueIsValid && isTouched
+  const valueIsValid = validateValue(inputState.value)
+  const hasError = !valueIsValid && inputState.isTouched
 
-  const valueChangeHandler = (e) => {
-    setEnteredValue(e.target.value)
+  const valueChangeHandler = (event) => {
+    dispatch({ type: 'INPUT', value: event.target.value })
+    // setEnteredValue(e.target.value)
   }
 
   const inputBlurHandler = (e) => {
-    setIsTouched(true) // if input was focused then it was touched
+    dispatch({ type: 'BLUR' })
+    // setIsTouched(true) // if input was focused then it was touched
   }
 
   const reset = () => {
-    setEnteredValue('')
-    setIsTouched(false)
+    dispatch({ type: 'RESET' })
+    // setEnteredValue('')
+    // setIsTouched(false)
   }
 
   //   functions being returned can be called from components that use this hook
 
   return {
-    value: enteredValue,
+    value: inputState.value,
     isValid: valueIsValid,
     hasError: hasError,
     valueChangeHandler,
